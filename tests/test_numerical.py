@@ -8,11 +8,11 @@ import torch.nn as nn
 import numpy as np
 
 from copy import deepcopy
-from fmoe.gates import NaiveGate
-from fmoe.layers import FMoE
-from fmoe.transformer import _Expert
-from fmoe.distributed import DistributedGroupedDataParallel as LocalDDP
-from fmoe.megatron.layers import _megatron_init_method
+from fmoe_llm.gates import NaiveGate
+from fmoe_llm.layers import FMoE
+from fmoe_llm.transformer import _Expert
+from fmoe_llm.distributed import DistributedGroupedDataParallel as LocalDDP
+from fmoe_llm.megatron.layers import _megatron_init_method
 from moe import BruteForceMoELinear, BruteForceMoE, NaiveExpert, LinearExpert
 
 
@@ -257,6 +257,7 @@ def test_fmoe(
         top_k=top_k,
     ).cuda().to(data_type)
 
+    print(world_size)
     if world_size == 1:
         for expert_moe, expert_raw in zip(moe.experts, moe_raw.experts):
             for para_moe, para_raw in zip(

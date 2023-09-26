@@ -3,6 +3,8 @@ from torch.utils.cpp_extension import BuildExtension, CUDAExtension
 import os
 import torch
 
+os.environ["CC"] = "/public/thu_zq_workspace/spack/opt/spack/linux-centos7-haswell/gcc-4.8.5/gcc-11.2.0-fpbhgz567mxojihihqmhtn2skzldm76n/bin/gcc"
+os.environ["CXX"] = "/public/thu_zq_workspace/spack/opt/spack/linux-centos7-haswell/gcc-4.8.5/gcc-11.2.0-fpbhgz567mxojihihqmhtn2skzldm76n/bin/g++"
 cxx_flags = []
 ext_libs = []
 
@@ -40,14 +42,14 @@ else:
 
 if __name__ == '__main__':
     setuptools.setup(
-        name='fastmoe',
+        name='fastmoe_llm',
         version='1.0.2',
         description='An efficient Mixture-of-Experts system for PyTorch',
         author=', '.join(authors),
         author_email='hja20@mails.tsinghua.edu.cn',
         license='Apache-2',
         url='https://github.com/laekov/fastmoe',
-        packages=['fmoe', 'fmoe.megatron', 'fmoe.gates', 'fmoe.fastermoe'],
+        packages=['fmoe_llm', 'fmoe_llm.megatron', 'fmoe_llm.gates', 'fmoe_llm.fastermoe'],
         ext_modules=[
             CUDAExtension(
                 name='fmoe_cuda', 

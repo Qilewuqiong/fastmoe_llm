@@ -14,19 +14,19 @@ void fmoe_cuda_expert_exchange_impl(
     NCCL_SAFE_CALL(ncclGroupStart());
     for (int i = 0; i < world_size; ++i) {
         NCCL_SAFE_CALL(ncclSend(
-                local_expert_count + n_expert * i,
-                n_expert,
-                ncclInt64,
-                i,
-                smgr->ncclcomm,
-                smgr->stream(0)));
+            local_expert_count + n_expert * i,
+            n_expert,
+            ncclInt64,
+            i,
+            smgr->ncclcomm,
+            smgr->stream(0)));
         NCCL_SAFE_CALL(ncclRecv(
-                global_expert_count + n_expert * i,
-                n_expert,
-                ncclInt64,
-                i,
-                smgr->ncclcomm,
-                smgr->stream(0)));
+            global_expert_count + n_expert * i,
+            n_expert,
+            ncclInt64,
+            i,
+            smgr->ncclcomm,
+            smgr->stream(0)));
     }
     NCCL_SAFE_CALL(ncclGroupEnd());
     smgr->sync(1);
@@ -114,6 +114,7 @@ public:
         if (rank == 0) {
             ncclGetUniqueId(&ncclID);
         }
+
 #if defined(TORCH_VERSION_MAJOR) && (TORCH_VERSION_MAJOR > 1 || \
         (TORCH_VERSION_MAJOR == 1 && TORCH_VERSION_MINOR >= 12))
         broadcastUniqueNCCLID(&ncclID,
@@ -129,8 +130,9 @@ public:
 #else
         broadcastUniqueNCCLID(&ncclID);
 #endif
+
         ncclComm_t comm;
-        NCCL_SAFE_CALL(ncclCommInitRank(&comm, getSize(), ncclID, rank));
+         NCCL_SAFE_CALL(ncclCommInitRank(&comm, getSize(), ncclID, rank));
         return comm;
     }
 };
@@ -140,7 +142,7 @@ void _ensure_nccl(c10d::ProcessGroup& p, torch::Tensor t) {
 #else
 void _ensure_nccl(c10d::ProcessGroupNCCL& p, torch::Tensor t) {
 #endif  // TORCH_VERSION
-    auto smgr = getCudaStreamManager(t.device().index());
+    auto smgr = getCudaStreamManager(t.get_device());
     if (smgr->ncclgood) {
         return;
     }
@@ -153,8 +155,10 @@ void _ensure_nccl(c10d::ProcessGroupNCCL& p, torch::Tensor t) {
     smgr->ncclcomm = h->getcomm(t.device());
     if (smgr->ncclcomm != 0) {
         smgr->ncclgood = 1;
-    } else {
-        std::cerr << "Nccl initialization failed\n";
+    }
+    else
+    {
+        std::cerr << "Nccl initialization failed\n"<<std::endl;
     }
 }
 

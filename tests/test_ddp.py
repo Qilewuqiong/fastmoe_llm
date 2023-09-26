@@ -13,7 +13,6 @@ from test_numerical import test_fmoe as _test_fmoe
 from test_numerical import test_fmoe_linear as _test_fmoe_linear
 from test_numerical import _test_fmoe_local_ddp
 
-
 def _ensure_initialized():
     if 'RANK' not in os.environ:
         os.environ["RANK"] = os.environ.get("OMPI_COMM_WORLD_RANK", "0")
@@ -26,6 +25,7 @@ def _ensure_initialized():
 
 def _run_distributed(func, world_size, args: Dict, script=__file__, env=dict()):
     device_count = torch.cuda.device_count()
+    print("device_count: ", device_count, " world_size: ", world_size)
     if device_count < world_size:
         pytest.skip("No enough GPU, only {} found".format(device_count))
     import subprocess
@@ -41,14 +41,15 @@ def _run_distributed(func, world_size, args: Dict, script=__file__, env=dict()):
         env["OMPI_COMM_WORLD_RANK"] = str(i)
         p = subprocess.Popen(
             [sys.executable, script, func, json.dumps(args)],
-            stdout=subprocess.PIPE,
             env=env
+#            stdout=subprocess.PIPE,
         )
         ps.append(p)
 
     for p in ps:
         p.wait()
         retc = p.poll()
+        print("retc: ", retc)
         assert retc == 0
 
 

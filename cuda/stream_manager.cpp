@@ -64,14 +64,16 @@ std::unordered_map<int, CudaStreamManager*> smgrs;
 std::mutex smgr_mtx;
 
 CudaStreamManager* getCudaStreamManager(const int device) {
+    std::pair<std::unordered_map<int, CudaStreamManager *>::iterator, bool > ret;
     auto it = smgrs.find(device);
     if (it == smgrs.end()) {
         smgr_mtx.lock();
         it = smgrs.find(device);
         if (it == smgrs.end()) {
             auto smgr = new CudaStreamManager(device);
-            smgrs.insert(std::pair<int, CudaStreamManager*>(device, smgr));
+            ret = smgrs.emplace(device, smgr);
             smgr_mtx.unlock();
+
             return smgr;
         } else {
             smgr_mtx.unlock();
