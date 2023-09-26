@@ -14,6 +14,7 @@ void fmoe_cuda_expert_exchange_impl(
     NCCL_SAFE_CALL(ncclGroupStart());
     for (int i = 0; i < world_size; ++i) {
         NCCL_SAFE_CALL(ncclSend(
+<<<<<<< HEAD
             local_expert_count + n_expert * i,
             n_expert,
             ncclInt64,
@@ -27,6 +28,21 @@ void fmoe_cuda_expert_exchange_impl(
             i,
             smgr->ncclcomm,
             smgr->stream(0)));
+=======
+                local_expert_count + n_expert * i,
+                n_expert,
+                ncclInt64,
+                i,
+                smgr->ncclcomm,
+                smgr->torchStream()));
+        NCCL_SAFE_CALL(ncclRecv(
+                global_expert_count + n_expert * i,
+                n_expert,
+                ncclInt64,
+                i,
+                smgr->ncclcomm,
+                smgr->torchStream()));
+>>>>>>> feeac0502f68b9d4ca2d381a28dedd736e67963a
     }
     NCCL_SAFE_CALL(ncclGroupEnd());
 }

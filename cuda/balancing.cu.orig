@@ -141,13 +141,23 @@ std::vector<torch::Tensor> _swipe_once(
     _d2h(d_lec, lec, n_worker);
     auto d_dropcount = _h2d(drop_count, n_worker);
     ncclAllReduce(d_dropcount, d_dropcount, n_worker, ncclInt64, ncclSum,
-    smgr->ncclcomm, smgr->stream());
+<<<<<<< HEAD
+                  smgr->ncclcomm, smgr->stream());
+=======
+            smgr->ncclcomm, smgr->torchStream());
+    smgr->syncTorch();
+>>>>>>> feeac0502f68b9d4ca2d381a28dedd736e67963a
     _d2h(d_dropcount, drop_count, n_worker);
 
     auto d_gcap = _cudamalloc<long>(n_worker);
     _h2d(&cap, d_gcap + rank, 1);
     ncclAllGather(d_gcap + rank, d_gcap, 1, ncclInt64,
+<<<<<<< HEAD
                   smgr->ncclcomm, smgr->stream());
+=======
+            smgr->ncclcomm, smgr->torchStream());
+    smgr->syncTorch();
+>>>>>>> feeac0502f68b9d4ca2d381a28dedd736e67963a
     auto gcap = _d2h(d_gcap, n_worker);
 
     /* Re-assign and update counters */
